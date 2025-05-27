@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jornada dos 37 Segredos - Etapa 8</title>
+    <style>
+        :root {
+            --branco-medico: #f8fbff;
+            --azul-profundo: #0057b8;
+            --verde-bio: #00c897;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--branco-medico);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* CONTADOR DE MOEDAS */
+        .contador-moedas {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+            font-size: 1.2em;
+            color: var(--azul-profundo);
+            z-index: 100;
+            user-select: none;
+            transition: all 0.3s;
+        }
+
+        .contador-moedas.brilhando {
+            box-shadow: 0 0 20px rgba(0, 200, 151, 0.6);
+            transform: scale(1.1);
+        }
+
+        /* ETAPA 1 */
+        .etapa-1 {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .headline {
+            font-size: 2.2em;
+            margin-bottom: 30px;
+        }
+
+        .imagem-destaque {
+            width: 70%;
+            max-width: 500px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .cta {
+            padding: 18px 45px;
+            background: var(--azul-profundo);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cta:hover {
+            transform: scale(1.05);
+        }
+
+        /* ETAPA 2 (INICIALMENTE OCULTA) */
+        .etapa-2 {
+            display: none;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .gamificacao-card {
+            background: white;
+            padding: 30px;
+            margin: 25px 0;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s;
+            border-left: 4px solid var(--verde-bio);
+        }
+
+        .gamificacao-emoji {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .gamificacao-titulo {
+            color: var(--azul-profundo);
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .gamificacao-descricao {
+            color: #666;
+            font-size: 1.1em;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .prova-social {
+            background: linear-gradient(135deg, var(--verde-bio), #00a67d);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+
+        .cta-proximo {
+            display: block;
+            margin: 50px auto;
+            padding: 18px 45px;
+            background: linear-gradient(95deg, var(--azul-profundo), var(--verde-bio));
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.4s;
+        }
+
+        .cta-proximo.ativo {
+            opacity: 1;
+        }
+
+        /* ETAPA 3 (INICIALMENTE OCULTA) */
+        .etapa-3 {
+            display: none;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .etapa-3 h2 {
+            margin-bottom: 5px;
+            color: var(--azul-profundo);
+        }
+
+        .texto-explicativo {
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            max-width: 400px;
+            text-align: center;
+            line-height: 1.4;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .roleta-container {
+            position: relative;
+            width: 400px;
+            height: 440px;
+            margin: 0 auto 20px auto;
+        }
+
+        .seta-indicador {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 30px solid #ffbf00;
+            z-index: 20;
+        }
+
+        #canvas {
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 0 15px rgba(0,200,151,0.3);
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+        }
+
+        #feedback {
+            margin-top: 20px;
+            font-size: 1.3em;
+            min-height: 2.4em;
+            font-weight: 600;
+            color: var(--verde-bio);
+            text-align: center;
+        }
+
+        #btnGirar {
+            margin-top: 30px;
+            padding: 14px 50px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, var(--azul-profundo), var(--verde-bio));
+            color: white;
+            cursor: pointer;
+            font-weight: 700;
+            user-select: none;
+            transition: transform 0.3s;
+        }
+
+        #btnGirar:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+
+        #btnGirar:disabled {
+            background: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #btnContinuar {
+            margin-top: 25px;
+            padding: 12px 40px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 50px;
+            background-color: #00c897;
+            color: white;
+            font-weight: bold;
+            display: none;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 200, 151, 0.6);
+            transition: transform 0.3s;
+        }
+
+        #btnContinuar:hover {
+            transform: scale(1.05);
+        }
+
+        /* ========== ETAPA 4 - BARRA DO DESESPERO ========== */
+        .etapa-4 {
+            display: none;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .etapa-4.ativa {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .titulo-tribunal {
+            font-size: 2.4em;
+            color: var(--azul-profundo);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitulo-tribunal {
+            font-size: 1.3em;
+            color: #666;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+
+        /* BARRA BALANÇA DE TRIBUNAL */
+        .balanca-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        .balanca-titulo {
+            font-size: 1.4em;
+            color: var(--azul-profundo);
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .barra-progresso {
+            position: relative;
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progresso-preenchido {
+            height: 100%;
+            background: linear-gradient(90deg, var(--azul-profundo), var(--verde-bio));
+            width: 0%;
+            border-radius: 10px;
+            transition: width 2s ease-out;
+            position: relative;
+        }
+
+        .progresso-preenchido::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 20px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
+            animation: brilho 2s infinite;
+        }
+
+        @keyframes brilho {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .moedas-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .moedas-atual {
+            color: var(--verde-bio);
+        }
+
+        .moedas-meta {
+            color: var(--azul-profundo);
+        }
+
+        /* COPY DESBLOQUEAR MOEDAS */
+        .copy-desbloquear {
+            background: linear-gradient(135deg, var(--verde-bio), #ffbf00);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 30px 0;
+            font-size: 1.2em;
+            font-weight: 600;
+            box-shadow: 0 5px 20px rgba(0, 200, 151, 0.2);
+        }
+
+        /* MÁSCARAS QUEBRADAS */
+        .mascaras-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 40px 0;
+            gap: 20px;
+        }
+
+        .mascara-card {
+            flex: 1;
+            max-width: 250px;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.6s ease-out;
+        }
+
+        .mascara-card.animada {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .mascara-boa {
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .mascara-amarga {
+            border-left: 4px solid var(--verde-bio);
+        }
+
+        .mascara-emoji {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .mascara-titulo {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--azul-profundo);
+        }
+
+        .mascara-descricao {
+            font-size: 0.95em;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* COPY PRINCIPAL */
+        .copy-tribunal {
+            background: linear-gradient(135deg, #fff, #f8fbff);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 40px 0;
+            border-left: 5px solid var(--azul-profundo);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .copy-titulo {
+            font-size: 1.6em;
+            color: var(--azul-profundo);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .copy-lista {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .copy-item {
+            font-size: 1.1em;
+            margin: 12px 0;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .copy-item::before {
+            content: '→';
+            color: var(--verde-bio);
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        /* CTA FINAL */
+        .cta-tribunal {
+            padding: 20px 50px;
+            background: linear-gradient(135deg, #d32f2f, #ff6b6b);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.3em;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px rgba(211, 47, 47, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cta-tribunal:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 12px 35px rgba(211, 47, 47, 0.4);
+        }
+
+        /* ========== ETAPA 5 - LABIRINTO DA FOME ========== */
+        .etapa-5 {
+            display: none;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .etapa-5.ativa {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .titulo-labirinto {
+            font-size: 2.4em;
+            color: var(--azul-profundo);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitulo-labirinto {
+            font-size: 1.4em;
+            color: #d32f2f;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .copy-decisiva {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 2px solid #ffbf00;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 30px 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #856404;
+        }
+
+        /* CONTAINER DAS ESCOLHAS */
+        .escolhas-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 50px 0;
+            gap: 30px;
+        }
+
+        .escolha-card {
+            flex: 1;
+            max-width: 350px;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.4s ease-out;
+            position: relative;
+            border: 3px solid transparent;
+        }
+
+        .escolha-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .escolha-card.selecionada {
+            border-color: var(--verde-bio);
+            background: linear-gradient(135deg, #fff, #f0fff4);
+        }
+
+        .escolha-emoji {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .escolha-titulo {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--azul-profundo);
+            margin-bottom: 15px;
+        }
+
+        .escolha-descricao {
+            font-size: 1.1em;
+            color: #666;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        .escolha-identidade {
+            font-size: 1em;
+            color: #999;
+            font-style: italic;
+        }
+
+        /* MOEDAS FLUTUANTES */
+        .moedas-flutuantes {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5em;
+            color: var(--verde-bio);
+            opacity: 0;
+            animation: piscarMoedas 2s infinite;
+        }
+
+        @keyframes piscarMoedas {
+            0%, 50% { opacity: 0; transform: scale(1); }
+            25% { opacity: 1; transform: scale(1.2); }
+            75% { opacity: 0.7; transform: scale(1.1); }
+            100% { opacity: 0; transform: scale(1); }
+        }
+
+        /* CTA BONUS */
+        .cta-bonus {
+            padding: 20px 50px;
+            background: linear-gradient(135deg, #ffbf00, #ff8c00);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.3em;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 40px;
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px rgba(255, 191, 0, 0.3);
+            opacity: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cta-bonus.ativo {
+            opacity: 1;
+        }
+
+        .cta-bonus:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 12px 35px rgba(255, 191, 0, 0.4);
+        }
+
+        /* ========== ETAPA 6 - TROCA SILENCIOSA ========== */
+        .etapa-6 {
+            display: none;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .etapa-6.ativa {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .titulo-troca {
+            font-size: 2.4em;
+            color: var(--azul-profundo);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        /* ANIMAÇÃO DE TROCA */
+        .troca-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 50px 0;
+            gap: 30px;
+        }
+
+        .moedas-antes {
+            font-size: 3em;
+            color: var(--verde-bio);
+            opacity: 1;
+            transition: all 1s ease-out;
+        }
+
+        .moedas-antes.sumindo {
+            opacity: 0;
+            transform: scale(0.5);
+        }
+
+        .seta-troca {
+            font-size: 2em;
+            color: var(--azul-profundo);
+            animation: pulsar 2s infinite;
+        }
+
+        @keyframes pulsar {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .selo-bonus {
+            background: linear-gradient(135deg, #ff6b6b, #ff8c00);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 20px;
+            font-size: 1.4em;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 1s ease-out;
+        }
+
+        .selo-bonus.aparecendo {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* PRÊMIO RESGATADO */
+        .premio-container {
+            background: linear-gradient(135deg, #fff, #f0fff4);
+            border: 3px solid var(--verde-bio);
+            padding: 40px;
+            border-radius: 20px;
+            margin: 40px 0;
+            box-shadow: 0 10px 30px rgba(0, 200, 151, 0.1);
+        }
+
+        .premio-imagem {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .premio-titulo {
+            font-size: 1.8em;
+            color: var(--azul-profundo);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .premio-descricao {
+            font-size: 1.3em;
+            color: #333;
+            line-height: 1.5;
+            font-weight: 600;
+        }
+
+        /* CONTADOR RESTANTE */
+        .contador-restante {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 30px 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--azul-profundo);
+        }
+
+        .contador-restante-titulo {
+            font-size: 1.2em;
+            color: var(--azul-profundo);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .contador-restante-valor {
+            font-size: 1.5em;
+            color: var(--verde-bio);
+            font-weight: 700;
+        }
+
+        /* CTA SABER MAIS */
+        .cta-saber-mais {
+            padding: 20px 50px;
+            background: linear-gradient(135deg, var(--azul-profundo), var(--verde-bio));
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.3em;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 40px;
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px rgba(0, 87, 184, 0.3);
+        }
+
+        .cta-saber-mais:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0, 87, 184, 0.4);
+        }
+
+        /* ========== ETAPA 7 - MENTE MAGRA EXPLICAÇÃO ========== */
+        .etapa-7 {
+            display: none;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .etapa-7.ativa {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .titulo-mente-magra {
+            font-size: 2.4em;
+            color: var(--azul-profundo);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .subtitulo-mente-magra {
+            font-size: 1.4em;
+            color: #d32f2f;
+            margin-bottom: 40px;
+            font-weight: 600;
+        }
+
+        /* LISTA DE BENEFÍCIOS */
+        .beneficios-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 40px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            text-align: left;
+        }
+
+        .beneficios-titulo {
+            font-size: 1.8em;
+            color: var(--azul-profundo);
+            margin-bottom: 30px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .beneficio-item {
+            display: flex;
+            align-items: flex-start;
+            margin: 25px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8fbff, #fff);
+            border-radius: 15px;
+            border-left: 4px solid var(--verde-bio);
+            box-shadow: 0 3px 15px rgba(0,0,0,0.03);
+            transition: all 0.3s ease-out;
+        }
+
+        .beneficio-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        .beneficio-check {
+            color: var(--verde-bio);
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-right: 15px;
+            margin-top: 2px;
+        }
+
+        .beneficio-texto {
+            flex: 1;
+        }
+
+        .beneficio-nome {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--azul-profundo);
+            margin-bottom: 8px;
+        }
+
+        .beneficio-descricao {
+            font-size: 1.1em;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* DESTAQUE ESPECIAL */
+        .destaque-especial {
+            background: linear-gradient(135deg, #ff6b6b, #ff8c00);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 40px 0;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+        }
+
+        .destaque-titulo {
+            font-size: 1.6em;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .destaque-texto {
+            font-size: 1.2em;
+            line-height: 1.4;
+        }
+
+        /* CTA DESCONTOS */
+        .cta-descontos {
+            padding: 20px 50px;
+            background: linear-gradient(135deg, #ffbf00, #ff8c00);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.3em;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 40px;
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px rgba(255, 191, 0, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cta-descontos:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 12px 35px rgba(255, 191, 0, 0.4);
+        }
+
+        /* ========== ETAPA 8 - JOGO DO TESOURO ========== */
+        .etapa-8 {
+            display: none;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .etapa-8.ativa {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .titulo-tesouro {
+            font-size: 2.4em;
+            color: var(--azul-profundo);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitulo-tesouro {
+            font-size: 1.4em;
+            color: #d32f2f;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .copy-tesouro {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 2px solid #ffbf00;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 30px 0;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #856404;
+        }
+
+        /* MAPA DO TESOURO */
+        .mapa-container {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 40px 0;
+            box-shadow: 0 10px 30px rgba(139, 69, 19, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mapa-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="30" r="1" fill="%23FFD700" opacity="0.3"/><circle cx="80" cy="70" r="1" fill="%23FFD700" opacity="0.3"/><circle cx="50" cy="20" r="1" fill="%23FFD700" opacity="0.3"/></svg>');
+            pointer-events: none;
+        }
+
+        .mapa-titulo {
+            color: #FFD700;
+            font-size: 1.6em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .grid-mapa {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            max-width: 400px;
+            margin: 0 auto 30px auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .celula-mapa {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #DEB887, #F4A460);
+            border: 2px solid #8B4513;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            cursor: pointer;
+            transition: all 0.3s ease-out;
+            position: relative;
+        }
+
+        .celula-mapa:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .celula-mapa.jogador {
+            background: linear-gradient(135deg, var(--verde-bio), #00a67d);
+            border-color: #fff;
+            animation: pulsoJogador 2s infinite;
+        }
+
+        @keyframes pulsoJogador {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .celula-mapa.caminho {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-color: #FF8C00;
+        }
+
+        .celula-mapa.tesouro {
+            background: linear-gradient(135deg, #FFD700, #FF6347);
+            border-color: #FF4500;
+            animation: brilhoTesouro 1.5s infinite;
+        }
+
+        @keyframes brilhoTesouro {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(255, 215, 0, 1); }
+        }
+
+        .celula-mapa.erro {
+            background: linear-gradient(135deg, #ff6b6b, #ff4757);
+            border-color: #ff3742;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* CONTROLES DE DIREÇÃO */
+        .controles-container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 30px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        .controles-titulo {
+            font-size: 1.4em;
+            color: var(--azul-profundo);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .direcoes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+
+        .btn-direcao {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--azul-profundo), var(--verde-bio));
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-direcao:hover:not(:disabled) {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 87, 184, 0.4);
+        }
+
+        .btn-direcao:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-cima { grid-column: 2; }
+        .btn-esquerda { grid-column: 1; grid-row: 2; }
+        .btn-direita { grid-column: 3; grid-row: 2; }
+        .btn-baixo { grid-column: 2; grid-row: 3; }
+
+        /* FEEDBACK DO JOGO */
+        .feedback-jogo {
+            background: linear-gradient(135deg, #fff, #f8fbff);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 4px solid var(--verde-bio);
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--azul-profundo);
+        }
+
+        .feedback-jogo.sucesso {
+            border-left-color: var(--verde-bio);
+            background: linear-gradient(135deg, #f0fff4, #e6fffa);
+            color: var(--verde-bio);
+        }
+
+        .feedback-jogo.erro {
+            border-left-color: #ff6b6b;
+            background: linear-gradient(135deg, #fff5f5, #fed7d7);
+            color: #d32f2f;
+        }
+
+        /* PROGRESSO DO JOGO */
+        .progresso-jogo {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .progresso-titulo {
+            font-size: 1.2em;
+            color: var(--azul-profundo);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .progresso-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-acertos {
+            color: var(--verde-bio);
+        }
+
+        .stat-erros {
+            color: #ff6b6b;
+        }
+
+        .stat-moedas {
+            color: #ffbf00;
+        }
+
+        /* CTA MAPA */
+        .cta-mapa {
+            padding: 20px 50px;
+            background: linear-gradient(135deg, #FFD700, #FF8C00);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.3em;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 40px;
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0;
+        }
+
+        .cta-mapa.ativo {
+            opacity: 1;
+        }
+
+        .cta-mapa:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 12px 35px rgba(255, 215, 0, 0.4);
+        }
+
+        /* RESPONSIVIDADE */
+        @media (max-width: 768px) {
+            .mascaras-container,
+            .escolhas-container,
+            .troca-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .titulo-tribunal,
+            .titulo-labirinto,
+            .titulo-troca,
+            .titulo-mente-magra,
+            .titulo-tesouro {
+                font-size: 1.8em;
+            }
+            
+            .cta-tribunal,
+            .cta-bonus,
+            .cta-saber-mais,
+            .cta-descontos,
+            .cta-mapa {
+                padding: 18px 40px;
+                font-size: 1.1em;
+            }
+
+            .beneficio-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .beneficio-check {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .grid-mapa {
+                max-width: 300px;
+            }
+
+            .celula-mapa {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="contador-moedas">✪0</div>
+
+    <!-- ========== ETAPA 1 ========== -->
+    <section class="etapa-1" id="etapa1">
+        <h1 class="headline">"O que as asiáticas escondem sobre arroz e frango está fazendo brasileiras eliminarem gordura sem academia."</h1>
+        <img src="https://i.postimg.cc/J4X1h6rv/Design-sem-nome.png" class="imagem-destaque" />
+        <button class="cta" onclick="iniciarEtapa2()">▶️ COMEÇAR AGORA →</button>
+    </section>
+
+    <!-- ========== ETAPA 2 ========== -->
+    <section class="etapa-2" id="etapa2">
+        <div class="gamificacao-card" id="card1">
+            <span class="gamificacao-emoji">💰</span>
+            <div class="gamificacao-titulo">GANHE MOEDAS POR CADA RESPOSTA</div>
+            <div class="gamificacao-descricao">
+                Cada interação te aproxima dos segredos mais valiosos para transformar seu corpo
+            </div>
+        </div>
+
+        <div class="gamificacao-card" id="card2">
+            <span class="gamificacao-emoji">🎁</span>
+            <div class="gamificacao-titulo">RESGATE SEU PRÊMIO</div>
+            <div class="gamificacao-descricao">
+                Acumule moedas e desbloqueie recompensas exclusivas que vão acelerar seus resultados
+            </div>
+        </div>
+
+        <div class="gamificacao-card" id="card3">
+            <span class="gamificacao-emoji">🔓</span>
+            <div class="gamificacao-titulo">DESBLOQUEIE AS RECEITAS OCULTAS</div>
+            <div class="gamificacao-descricao">
+                Acesse fórmulas secretas que a indústria não quer que você conheça
+            </div>
+        </div>
+
+        <div class="gamificacao-card" id="card4">
+            <span class="gamificacao-emoji">💰</span>
+            <div class="gamificacao-titulo">GANHE UM SUPER DESCONTO</div>
+            <div class="gamificacao-descricao">
+                Responda mais perguntas e economize ainda mais na sua transformação
+            </div>
+        </div>
+
+        <div class="prova-social">
+            🔥 559 PESSOAS JÁ PARTICIPARAM HOJE
+        </div>
+
+        <button class="cta-proximo" onclick="mostrarEtapa3()">💣 PRÓXIMO PASSO →</button>
+    </section>
+
+    <!-- ========== ETAPA 3 ========== -->
+    <section class="etapa-3" id="etapa3">
+        <h2>🎰 Roleta da Sobrevivência</h2>
+        <p class="texto-explicativo">
+            Gire e descubra se você merece o corpo que quer...<br />
+            Ou se vai continuar sendo espectadora da própria vida.
+        </p>
+
+        <div class="roleta-container">
+            <div class="seta-indicador"></div>
+            <canvas id="canvas" width="400" height="400"></canvas>
+        </div>
+
+        <div id="feedback"></div>
+
+        <button id="btnGirar">☠️ GIRAR AGORA →</button>
+        <button id="btnContinuar" onclick="mostrarEtapa4()">✅ Continuar a Jornada</button>
+    </section>
+
+    <!-- ========== ETAPA 4 - BARRA DO DESESPERO ========== -->
+    <section class="etapa-4" id="etapa4">
+        <h1 class="titulo-tribunal">⚖️ TRIBUNAL DA VERDADE</h1>
+        <p class="subtitulo-tribunal">Sua última chance de não ser cúmplice da própria mediocridade</p>
+
+        <div class="balanca-container">
+            <div class="balanca-titulo">BARRA DO SEU ÚLTIMO ARGUMENTO</div>
+            
+            <div class="barra-progresso">
+                <div class="progresso-preenchido" id="barraProgresso"></div>
+            </div>
+            
+            <div class="moedas-info">
+                <span class="moedas-atual">✪ 30 conquistadas</span>
+                <span class="moedas-meta">✪ 100 para a liberdade</span>
+            </div>
+        </div>
+
+        <div class="copy-desbloquear">
+            💎 DESBLOQUEIE MAIS MOEDAS AVANÇANDO NA JORNADA
+        </div>
+
+        <div class="mascaras-container">
+            <div class="mascara-card mascara-boa" id="mascara1">
+                <span class="mascara-emoji">🎭</span>
+                <div class="mascara-titulo">"A Boa Madrinha"</div>
+                <div class="mascara-descricao">
+                    Sempre sorrindo, sempre "está tudo bem".<br>
+                    Esconde a dor atrás do "pelo menos tenho saúde".
+                </div>
+            </div>
+            
+            <div class="mascara-card mascara-amarga" id="mascara2">
+                <span class="mascara-emoji">💔</span>
+                <div class="mascara-titulo">"A Amarga Invejosa"</div>
+                <div class="mascara-descricao">
+                    Critica quem emagrece, sabota quem tenta.<br>
+                    "Ela só conseguiu porque tem dinheiro/tempo/sorte".
+                </div>
+            </div>
+        </div>
+
+        <div class="copy-tribunal">
+            <div class="copy-titulo">ESTA BARRA É SEU ÚLTIMO ARGUMENTO CONTRA:</div>
+            <div class="copy-lista">
+                <div class="copy-item">Fingir que "está tudo bem" quando te chamam de "fofinha"</div>
+                <div class="copy-item">Sorrir enquanto compram roupas P na sua frente</div>
+                <div class="copy-item">Aceitar ser a "amiga engraçada" porque "beleza não é tudo"</div>
+                <div class="copy-item">Fingir que não dói quando dizem "você tem um rosto tão bonito"</div>
+            </div>
+        </div>
+
+        <button class="cta-tribunal" onclick="mostrarEtapa5()">
+            ⚰️ ENTERRE SUA VERSÃO INACABADA →
+        </button>
+    </section>
+
+    <!-- ========== ETAPA 5 - LABIRINTO DA FOME ========== -->
+    <section class="etapa-5" id="etapa5">
+        <h1 class="titulo-labirinto">🍽️ LABIRINTO DA FOME</h1>
+        <p class="subtitulo-labirinto">🍗 "ESCOLHA: SUA FOME OU SUA IDENTIDADE?"</p>
+
+        <div class="copy-decisiva">
+            ⚠️ SUA ESCOLHA AQUI DETERMINARÁ SEU BÔNUS EXCLUSIVO!
+        </div>
+
+        <div class="escolhas-container">
+            <div class="escolha-card" id="escolha1" onclick="selecionarEscolha(1)">
+                <div class="moedas-flutuantes">✪+20</div>
+                <span class="escolha-emoji">🍗</span>
+                <div class="escolha-titulo">FRANGO XADREZ LIGHT</div>
+                <div class="escolha-descricao">
+                    Proteína magra, temperos naturais, vegetais frescos.<br>
+                    A escolha de quem quer resultados reais.
+                </div>
+                <div class="escolha-identidade">→ Ambiciosa invisível</div>
+            </div>
+            
+            <div class="escolha-card" id="escolha2" onclick="selecionarEscolha(2)">
+                <div class="moedas-flutuantes">✪+5</div>
+                <span class="escolha-emoji">🍝</span>
+                <div class="escolha-titulo">LASANHA DE MICRO-ONDAS</div>
+                <div class="escolha-descricao">
+                    Praticidade, conservantes, gordura trans.<br>
+                    O caminho mais fácil para o mesmo lugar.
+                </div>
+                <div class="escolha-identidade">→ Confortável conformada</div>
+            </div>
+        </div>
+
+        <button class="cta-bonus" onclick="mostrarEtapa6()">
+            🎁 DESBLOQUEAR MEU BÔNUS AGORA
+        </button>
+    </section>
+
+    <!-- ========== ETAPA 6 - TROCA SILENCIOSA ========== -->
+    <section class="etapa-6" id="etapa6">
+        <h1 class="titulo-troca">🔄 TROCA SILENCIOSA</h1>
+
+        <div class="troca-container">
+            <div class="moedas-antes" id="moedasAntes">✪50</div>
+            <div class="seta-troca">→</div>
+            <div class="selo-bonus" id="seloBonus">
+                🏆 BÔNUS #1<br>DESBLOQUEADO
+            </div>
+        </div>
+
+        <div class="premio-container">
+            <img src="https://i.postimg.cc/qqrv3Mkj/C89-EDDF9-0702-4955-9-ACE-2080-BC5-A4-BB2.png" alt="A Mente Magra" class="premio-imagem" />
+            <div class="premio-titulo">🔄 PRÊMIO RESGATADO:</div>
+            <div class="premio-descricao">
+                A Mente Magra - Como Pensar Como<br>
+                Quem Já Emagreceu
+            </div>
+        </div>
+
+        <div class="contador-restante">
+            <div class="contador-restante-titulo">Moedas Restantes:</div>
+            <div class="contador-restante-valor" id="contadorRestante">✪0</div>
+        </div>
+
+        <button class="cta-saber-mais" onclick="mostrarEtapa7()">
+            💎 QUERO SABER MAIS →
+        </button>
+    </section>
+
+    <!-- ========== ETAPA 7 - MENTE MAGRA EXPLICAÇÃO ========== -->
+    <section class="etapa-7" id="etapa7">
+        <h1 class="titulo-mente-magra">🧠 A MENTE MAGRA™</h1>
+        <p class="subtitulo-mente-magra">O QUE VOCÊ ACABOU DE DESBLOQUEAR:</p>
+
+        <div class="beneficios-container">
+            <div class="beneficios-titulo">🎯 TRANSFORMAÇÕES MENTAIS ATIVADAS:</div>
+            
+            <div class="beneficio-item">
+                <div class="beneficio-check">✅</div>
+                <div class="beneficio-texto">
+                    <div class="beneficio-nome">Mente de Magra™ desbloqueada:</div>
+                    <div class="beneficio-descricao">Você aprende a fazer escolhas como quem já atingiu o objetivo, e não como quem ainda tá tentando.</div>
+                </div>
+            </div>
+
+            <div class="beneficio-item">
+                <div class="beneficio-check">✅</div>
+                <div class="beneficio-texto">
+                    <div class="beneficio-nome">Sistema "Gatilho da Vergonha" ativado:</div>
+                    <div class="beneficio-descricao">Técnicas mentais pra sentir nojo da autossabotagem e prazer em dizer "não" pra comida lixo.</div>
+                </div>
+            </div>
+
+            <div class="beneficio-item">
+                <div class="beneficio-check">✅</div>
+                <div class="beneficio-texto">
+                    <div class="beneficio-nome">Rituais diários de reprogramação alimentar:</div>
+                    <div class="beneficio-descricao">Práticas mentais de 2 minutos pra enfiar disciplina no teu cérebro antes de levantar da cama.</div>
+                </div>
+            </div>
+
+            <div class="beneficio-item">
+                <div class="beneficio-check">✅</div>
+                <div class="beneficio-texto">
+                    <div class="beneficio-nome">Anti-desculpismo:</div>
+                    <div class="beneficio-descricao">Estratégia mental pra nunca mais usar TPM, cansaço ou "eventos sociais" como desculpa pra enfiar o pé no balde.</div>
+                </div>
+            </div>
+
+            <div class="beneficio-item">
+                <div class="beneficio-check">✅</div>
+                <div class="beneficio-texto">
+                    <div class="beneficio-nome">Visualização de Colapso:</div>
+                    <div class="beneficio-descricao">Técnica sinistra que te mostra, com detalhes, o que vai acontecer se continuar do jeito que tá (spoiler: é triste).</div>
+                </div>
+            </div>
+
+            <div class="beneficio-item">
+                <div class="beneficio-check">✅</div>
+                <div class="beneficio-texto">
+                    <div class="beneficio-nome">Modelo mental das vitoriosas:</div>
+                    <div class="beneficio-descricao">Você copia exatamente o padrão de pensamento das mulheres que já secaram 15kg e hoje só postam foto de biquíni em silêncio.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="destaque-especial">
+            <div class="destaque-titulo">🔥 ATENÇÃO ESPECIAL:</div>
+            <div class="destaque-texto">
+                Este é apenas o PRIMEIRO bônus da sua jornada. Continue desbloqueando mais recompensas exclusivas e descontos progressivos!
+            </div>
+        </div>
+
+        <button class="cta-descontos" onclick="mostrarEtapa8()">
+            💥 DESBLOQUEAR MAIS DESCONTOS EXCLUSIVOS →
+        </button>
+    </section>
+
+    <!-- ========== ETAPA 8 - JOGO DO TESOURO ========== -->
+    <section class="etapa-8" id="etapa8">
+        <h1 class="titulo-tesouro">🗺️ JOGO DO TESOURO</h1>
+        <p class="subtitulo-tesouro">ENCONTRE O CAMINHO PARA O TESOURO!</p>
+
+        <div class="copy-tesouro">
+            ⚡ Cada passo certo vale +2 moedas! Escolha sua direção com sabedoria...
+        </div>
+
+        <div class="mapa-container">
+            <div class="mapa-titulo">🏴‍☠️ MAPA DO TESOURO PERDIDO</div>
+            
+            <div class="grid-mapa" id="gridMapa">
+                <!-- Grid será gerado pelo JavaScript -->
+            </div>
+
+            <div class="progresso-jogo">
+                <div class="progresso-titulo">📊 PROGRESSO DA EXPEDIÇÃO:</div>
+                <div class="progresso-stats">
+                    <div class="stat-item stat-acertos">
+                        <span>✅</span>
+                        <span id="contadorAcertos">0</span>
+                    </div>
+                    <div class="stat-item stat-erros">
+                        <span>❌</span>
+                        <span id="contadorErros">0</span>
+                    </div>
+                    <div class="stat-item stat-moedas">
+                        <span>✪</span>
+                        <span id="moedasGanhas">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controles-container">
+            <div class="controles-titulo">🧭 ESCOLHA SUA DIREÇÃO:</div>
+            
+            <div class="direcoes-grid">
+                <button class="btn-direcao btn-cima" onclick="moverJogador('cima')" id="btnCima">
+                    ⬆️
+                </button>
+                <button class="btn-direcao btn-esquerda" onclick="moverJogador('esquerda')" id="btnEsquerda">
+                    ⬅️
+                </button>
+                <button class="btn-direcao btn-direita" onclick="moverJogador('direita')" id="btnDireita">
+                    ➡️
+                </button>
+                <button class="btn-direcao btn-baixo" onclick="moverJogador('baixo')" id="btnBaixo">
+                    ⬇️
+                </button>
+            </div>
+        </div>
+
+        <div class="feedback-jogo" id="feedbackJogo">
+            🗺️ Use os botões de direção para navegar pelo mapa e encontrar o tesouro!
+        </div>
+
+        <button class="cta-mapa" onclick="proximaEtapa()" id="ctaMapa">
+            ⚡ DESVENDAR O MAPA!
+        </button>
+    </section>
+
+<script>
+    let escolhaSelecionada = null;
+    let moedasTotais = 0;
+
+    // ========== VARIÁVEIS DO JOGO DO TESOURO ==========
+    let posicaoJogador = { x: 0, y: 4 }; // Começa no canto inferior esquerdo
+    let posicaoTesouro = { x: 4, y: 0 }; // Tesouro no canto superior direito
+    let caminhoCorreto = [
+        { x: 0, y: 4 }, { x: 1, y: 4 }, { x: 2, y: 4 }, { x: 2, y: 3 },
+        { x: 2, y: 2 }, { x: 3, y: 2 }, { x: 4, y: 2 }, { x: 4, y: 1 }, { x: 4, y: 0 }
+    ];
+    let passoAtual = 0;
+    let acertos = 0;
+    let erros = 0;
+    let moedasJogo = 0;
+    let jogoCompleto = false;
+
+    // Controle de navegação entre etapas
+    function iniciarEtapa2() {
+        window.scrollTo(0, 0);
+        document.getElementById('etapa1').style.display = 'none';
+        document.getElementById('etapa2').style.display = 'block';
+        
+        // Manter contador em 0
+        setTimeout(() => {
+            document.querySelector('.contador-moedas').textContent = '✪0';
+        }, 500);
+        
+        // Animar cards de gamificação
+        const cards = document.querySelectorAll('.gamificacao-card');
+        cards.forEach((el, i) => {
+            setTimeout(() => {
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            }, i * 300);
+        });
+        
+        // Mostrar botão próximo com delay
+        setTimeout(() => {
+            document.querySelector('.cta-proximo').classList.add('ativo');
+        }, 1400);
+    }
+
+    function mostrarEtapa3() {
+        window.scrollTo(0, 0);
+        document.getElementById('etapa2').style.display = 'none';
+        document.getElementById('etapa3').style.display = 'block';
+        
+        // Manter contador em 0
+        setTimeout(() => {
+            document.querySelector('.contador-moedas').textContent = '✪0';
+        }, 500);
+    }
+
+    function mostrarEtapa4() {
+        window.scrollTo(0, 0);
+        document.getElementById('etapa3').style.display = 'none';
+        document.getElementById('etapa4').style.display = 'block';
+        
+        // Manter 30 moedas
+        moedasTotais = 30;
+        setTimeout(() => {
+            document.querySelector('.contador-moedas').textContent = '✪30';
+        }, 300);
+        
+        // Ativar animação da etapa 4
+        setTimeout(() => {
+            document.getElementById('etapa4').classList.add('ativa');
+            iniciarAnimacoesEtapa4();
+        }, 100);
+    }
+
+    function mostrarEtapa5() {
+        window.scrollTo(0, 0);
+        document.getElementById('etapa4').style.display = 'none';
+        document.getElementById('etapa5').style.display = 'block';
+        
+        // Ativar animação da etapa 5
+        setTimeout(() => {
+            document.getElementById('etapa5').classList.add('ativa');
+            iniciarAnimacoesEtapa5();
+        }, 100);
+    }
+
+    function mostrarEtapa6() {
+        if (!escolhaSelecionada) {
+            alert('⚠️ Faça sua escolha primeiro!\n\nDecida entre sua fome ou sua identidade...');
+            return;
+        }
+
+        window.scrollTo(0, 0);
+        document.getElementById('etapa5').style.display = 'none';
+        document.getElementById('etapa6').style.display = 'block';
+        
+        // Ativar animação da etapa 6
+        setTimeout(() => {
+            document.getElementById('etapa6').classList.add('ativa');
+            iniciarAnimacaoTroca();
+        }, 100);
+    }
+
+    function mostrarEtapa7() {
+        window.scrollTo(0, 0);
+        document.getElementById('etapa6').style.display = 'none';
+        document.getElementById('etapa7').style.display = 'block';
+        
+        // Ativar animação da etapa 7
+        setTimeout(() => {
+            document.getElementById('etapa7').classList.add('ativa');
+            iniciarAnimacoesEtapa7();
+        }, 100);
+    }
+
+    function mostrarEtapa8() {
+        window.scrollTo(0, 0);
+        document.getElementById('etapa7').style.display = 'none';
+        document.getElementById('etapa8').style.display = 'block';
+        
+        // Ativar animação da etapa 8
+        setTimeout(() => {
+            document.getElementById('etapa8').classList.add('ativa');
+            iniciarJogoTesouro();
+        }, 100);
+    }
+
+    function iniciarAnimacoesEtapa4() {
+        // Animar barra de progresso (30%)
+        setTimeout(() => {
+            document.getElementById('barraProgresso').style.width = '30%';
+        }, 500);
+        
+        // Animar máscaras
+        setTimeout(() => {
+            document.getElementById('mascara1').classList.add('animada');
+        }, 1000);
+        
+        setTimeout(() => {
+            document.getElementById('mascara2').classList.add('animada');
+        }, 1300);
+    }
+
+    function iniciarAnimacoesEtapa5() {
+        // Ativar animação das moedas piscando
+        setTimeout(() => {
+            document.querySelectorAll('.moedas-flutuantes').forEach(el => {
+                el.style.display = 'block';
+            });
+        }, 800);
+    }
+
+    function iniciarAnimacaoTroca() {
+        // Mostrar moedas atuais (máximo 50)
+        document.getElementById('moedasAntes').textContent = `✪${moedasTotais}`;
+        
+        // Animar troca após 2 segundos
+        setTimeout(() => {
+            // Fazer moedas sumirem
+            document.getElementById('moedasAntes').classList.add('sumindo');
+            
+            // Fazer selo aparecer
+            setTimeout(() => {
+                document.getElementById('seloBonus').classList.add('aparecendo');
+                
+                // TROCA COMPLETA: todas as moedas viram 0
+                document.querySelector('.contador-moedas').textContent = '✪0';
+                document.getElementById('contadorRestante').textContent = '✪0';
+                moedasTotais = 0;
+                
+            }, 500);
+        }, 2000);
+    }
+
+    function iniciarAnimacoesEtapa7() {
+        // Animar benefícios um por um
+        const beneficios = document.querySelectorAll('.beneficio-item');
+        beneficios.forEach((beneficio, index) => {
+            setTimeout(() => {
+                beneficio.style.opacity = '0';
+                beneficio.style.transform = 'translateX(-20px)';
+                beneficio.style.transition = 'all 0.6s ease-out';
+                
+                setTimeout(() => {
+                    beneficio.style.opacity = '1';
+                    beneficio.style.transform = 'translateX(0)';
+                }, 100);
+            }, index * 200);
+        });
+    }
+
+    function selecionarEscolha(numero) {
+        // Remover seleção anterior
+        document.querySelectorAll('.escolha-card').forEach(card => {
+            card.classList.remove('selecionada');
+        });
+        
+        // Selecionar nova escolha
+        document.getElementById(`escolha${numero}`).classList.add('selecionada');
+        escolhaSelecionada = numero;
+        
+        // Atualizar contador de moedas
+        const contador = document.querySelector('.contador-moedas');
+        let moedasGanhas = numero === 1 ? 20 : 5; // Frango = +20, Lasanha = +5
+        moedasTotais += moedasGanhas;
+        
+        contador.textContent = `✪${moedasTotais}`;
+        contador.classList.add('brilhando');
+        
+        setTimeout(() => {
+            contador.classList.remove('brilhando');
+        }, 1000);
+        
+        // Mostrar CTA
+        setTimeout(() => {
+            document.querySelector('.cta-bonus').classList.add('ativo');
+        }, 500);
+    }
+
+    // ========== FUNÇÕES DO JOGO DO TESOURO ==========
+    function iniciarJogoTesouro() {
+        criarGridMapa();
+        atualizarContadores();
+        atualizarFeedback('🗺️ Use os botões de direção para navegar pelo mapa e encontrar o tesouro!');
+    }
+
+    function criarGridMapa() {
+        const grid = document.getElementById('gridMapa');
+        grid.innerHTML = '';
+        
+        for (let y = 0; y < 5; y++) {
+            for (let x = 0; x < 5; x++) {
+                const celula = document.createElement('div');
+                celula.className = 'celula-mapa';
+                celula.id = `celula-${x}-${y}`;
+                
+                // Posição inicial do jogador
+                if (x === posicaoJogador.x && y === posicaoJogador.y) {
+                    celula.classList.add('jogador');
+                    celula.textContent = '🧭';
+                }
+                // Posição do tesouro (oculta inicialmente)
+                else if (x === posicaoTesouro.x && y === posicaoTesouro.y) {
+                    celula.textContent = '❓';
+                }
+                // Células vazias
+                else {
+                    celula.textContent = '🌊';
+                }
+                
+                grid.appendChild(celula);
+            }
+        }
+    }
+
+    function moverJogador(direcao) {
+        if (jogoCompleto) return;
+        
+        let novaPosicao = { ...posicaoJogador };
+        
+        switch (direcao) {
+            case 'cima':
+                novaPosicao.y = Math.max(0, posicaoJogador.y - 1);
+                break;
+            case 'baixo':
+                novaPosicao.y = Math.min(4, posicaoJogador.y + 1);
+                break;
+            case 'esquerda':
+                novaPosicao.x = Math.max(0, posicaoJogador.x - 1);
+                break;
+            case 'direita':
+                novaPosicao.x = Math.min(4, posicaoJogador.x + 1);
+                break;
+        }
+        
+        // Verificar se o movimento é válido (não saiu do grid)
+        if (novaPosicao.x === posicaoJogador.x && novaPosicao.y === posicaoJogador.y) {
+            atualizarFeedback('🚫 Movimento inválido! Você não pode sair do mapa!', 'erro');
+            return;
+        }
+        
+        // Verificar se é o próximo passo correto
+        const proximoPasso = caminhoCorreto[passoAtual + 1];
+        
+        if (proximoPasso && novaPosicao.x === proximoPasso.x && novaPosicao.y === proximoPasso.y) {
+            // Movimento correto!
+            acertos++;
+            moedasJogo += 2;
+            passoAtual++;
+            
+            // Remover jogador da posição atual
+            const celulaAtual = document.getElementById(`celula-${posicaoJogador.x}-${posicaoJogador.y}`);
+            celulaAtual.classList.remove('jogador');
+            celulaAtual.classList.add('caminho');
+            celulaAtual.textContent = '✨';
+            
+            // Mover jogador para nova posição
+            posicaoJogador = novaPosicao;
+            const novaCelula = document.getElementById(`celula-${posicaoJogador.x}-${posicaoJogador.y}`);
+            novaCelula.classList.add('jogador');
+            novaCelula.textContent = '🧭';
+            
+            // Verificar se chegou ao tesouro
+            if (posicaoJogador.x === posicaoTesouro.x && posicaoJogador.y === posicaoTesouro.y) {
+                // TESOURO ENCONTRADO!
+                novaCelula.classList.add('tesouro');
+                novaCelula.textContent = '💰';
+                jogoCompleto = true;
+                
+                // Bônus por completar o jogo
+                moedasJogo += 10;
+                moedasTotais += moedasJogo;
+                
+                atualizarFeedback('🎉 TESOURO ENCONTRADO! Você ganhou +10 moedas bônus!', 'sucesso');
+                
+                // Atualizar contador principal
+                const contador = document.querySelector('.contador-moedas');
+                contador.textContent = `✪${moedasTotais}`;
+                contador.classList.add('brilhando');
+                
+                setTimeout(() => {
+                    contador.classList.remove('brilhando');
+                }, 2000);
+                
+                // Mostrar CTA final
+                setTimeout(() => {
+                    document.getElementById('ctaMapa').classList.add('ativo');
+                }, 1000);
+                
+                // Desabilitar botões
+                desabilitarBotoes();
+                
+            } else {
+                atualizarFeedback(`⚡ Excelente! +2 moedas! Continue seguindo o mapa...`, 'sucesso');
+            }
+            
+        } else {
+            // Movimento incorreto
+            erros++;
+            
+            // Marcar célula como erro temporariamente
+            const celulaErro = document.getElementById(`celula-${novaPosicao.x}-${novaPosicao.y}`);
+            celulaErro.classList.add('erro');
+            
+            setTimeout(() => {
+                celulaErro.classList.remove('erro');
+            }, 1000);
+            
+            atualizarFeedback('❌ Caminho errado! O mapa indica outra direção...', 'erro');
+        }
+        
+        atualizarContadores();
+    }
+
+    function atualizarContadores() {
+        document.getElementById('contadorAcertos').textContent = acertos;
+        document.getElementById('contadorErros').textContent = erros;
+        document.getElementById('moedasGanhas').textContent = moedasJogo;
+    }
+
+    function atualizarFeedback(mensagem, tipo = '') {
+        const feedback = document.getElementById('feedbackJogo');
+        feedback.textContent = mensagem;
+        feedback.className = `feedback-jogo ${tipo}`;
+    }
+
+    function desabilitarBotoes() {
+        document.getElementById('btnCima').disabled = true;
+        document.getElementById('btnBaixo').disabled = true;
+        document.getElementById('btnEsquerda').disabled = true;
+        document.getElementById('btnDireita').disabled = true;
+    }
+
+    function proximaEtapa() {
+        if (!jogoCompleto) {
+            alert('🗺️ Complete o jogo do tesouro primeiro!\n\nEncontre o caminho correto para desbloquear a próxima etapa...');
+            return;
+        }
+        
+        alert(`🎉 Parabéns! Você completou o Jogo do Tesouro!\n\nMoedas ganhas: ${moedasJogo}\nTotal de moedas: ${moedasTotais}\n\nContinue sua jornada para descobrir mais desafios...`);
+        // Aqui você adicionaria a navegação para a Etapa 9
+    }
+
+    // ======= Código da Etapa 3 (Roleta) =======
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const btnGirar = document.getElementById('btnGirar');
+    const btnContinuar = document.getElementById('btnContinuar');
+    const contador = document.querySelector('.contador-moedas');
+    const feedback = document.getElementById('feedback');
+
+    const urlAudio = 'https://actions.google.com/sounds/v1/casino/roulette_spin.ogg';
+
+    const alimentos = [
+        { nome: 'Limão', emoji: '🍋', cor: '#FFE066' },
+        { nome: 'Couve', emoji: '🥬', cor: '#A0E7E5' },
+        { nome: 'Cenoura', emoji: '🥕', cor: '#FFAEBC' },
+        { nome: 'Frango', emoji: '🍗', cor: '#FF8C61' },
+        { nome: 'Arroz', emoji: '🍚', cor: '#B5EAEA' },
+        { nome: 'Batata Doce', emoji: '🍠', cor: '#FFB5A7' },
+    ];
+
+    const numSegmentos = alimentos.length;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = 180;
+
+    let startAngle = 0;
+    let spinning = false;
+    let spinTimeout;
+    let spinAngleStart = 0;
+    let spinTime = 0;
+    let spinTimeTotal = 0;
+    let jaGirou = false;
+    let vencedor = null;
+
+    function drawWheel() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const arc = (2 * Math.PI) / numSegmentos;
+
+        for (let i = 0; i < numSegmentos; i++) {
+            const angle = startAngle + i * arc;
+            ctx.fillStyle = alimentos[i].cor;
+            ctx.strokeStyle = '#00c897';
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, angle, angle + arc, false);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(angle + arc / 2);
+            ctx.font = '28px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#0057b8';
+            ctx.fillText(alimentos[i].emoji, radius * 0.6, -10);
+            ctx.font = '18px Arial';
+            ctx.fillText(alimentos[i].nome, radius * 0.6, 20);
+            ctx.restore();
+        }
+    }
+
+    function spin() {
+        spinAngleStart = Math.random() * 10 + 10;
+        spinTime = 0;
+        spinTimeTotal = (Math.random() * 3 + 4) * 1000;
+        rotateWheel();
+    }
+
+    function rotateWheel() {
+        spinTime += 30;
+        if (spinTime >= spinTimeTotal) {
+            stopRotateWheel();
+            return;
+        }
+
+        const t = spinTime / spinTimeTotal;
+        const deltaAngle = spinAngleStart * (1 - cubicOut(t));
+        startAngle += (deltaAngle * Math.PI / 180);
+        startAngle %= 2 * Math.PI;
+
+        drawWheel();
+        spinTimeout = setTimeout(rotateWheel, 30);
+    }
+
+    function cubicOut(t) {
+        const f = t - 1;
+        return f * f * f + 1;
+    }
+
+    function stopRotateWheel() {
+        clearTimeout(spinTimeout);
+        const arc = (2 * Math.PI) / numSegmentos;
+        const normalizedAngle = startAngle % (2 * Math.PI);
+        const selectedIndex = Math.floor(((2 * Math.PI) - normalizedAngle) / arc) % numSegmentos;
+        vencedor = alimentos[selectedIndex];
+
+        if (!jaGirou) {
+            // VALOR FIXO: sempre 30 moedas independente do resultado
+            const moedasGanhas = 30;
+            moedasTotais = moedasGanhas;
+            document.querySelector('.contador-moedas').textContent = `✪${moedasGanhas}`;
+        
+            feedback.textContent = `🎉 Excelente! Você conquistou suas primeiras ${moedasGanhas} moedas! Continue sua jornada para descobrir mais segredos...`;
+
+            btnGirar.style.display = 'none';
+            btnContinuar.style.display = 'inline-block';
+            jaGirou = true;
+        }
+    }
+
+    btnGirar.addEventListener('click', () => {
+        if (spinning || jaGirou) return;
+        spinning = true;
+        feedback.textContent = '';
+        btnGirar.disabled = true;
+        btnGirar.textContent = 'Girando... 🎲';
+        btnContinuar.style.display = 'none';
+
+        const audioRoleta = new Audio(urlAudio);
+        audioRoleta.play().catch(e => console.log('Erro ao tocar áudio:', e));
+
+        spin();
+        setTimeout(() => { spinning = false; }, spinTimeTotal + 100);
+    });
+
+    canvas.addEventListener('click', () => {
+        if (spinning || jaGirou) return;
+        btnGirar.click();
+    });
+
+    // Inicializar roleta
+    if (canvas) {
+        drawWheel();
+    }
+</script>
+</body>
+</html>
